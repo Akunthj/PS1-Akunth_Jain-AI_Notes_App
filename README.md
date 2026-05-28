@@ -98,12 +98,7 @@ ai-notes-app/
 
 ---
 
-## Screenshots
-
-*(Add screenshots after deployment)*
-
----
 
 ## Author
 
-Your Name — BITS Pilani, PS-I 2026 @ KVGAI Tech Pvt. Ltd.
+Akunth Jain — BITS Pilani, PS-I 2026 @ KVGAI Tech Pvt. Ltd.
