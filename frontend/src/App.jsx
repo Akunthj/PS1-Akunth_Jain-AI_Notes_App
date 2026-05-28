@@ -14,7 +14,7 @@ import NoteEditor from "./components/NoteEditor";
 import SearchBar from "./components/SearchBar";
 import AuthPage from "./components/AuthPage";
 
-export const API_BASE = "http://localhost:8000";
+export const API_BASE = "https://ps1-akunth-jain-ai-notes-app.onrender.com";
 
 // ---- HELPER: build auth headers ----
 // Every protected request needs: Authorization: Bearer <token>
