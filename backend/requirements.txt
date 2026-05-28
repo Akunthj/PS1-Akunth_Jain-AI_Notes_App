@@ -9,3 +9,4 @@ python-dotenv==1.0.1   # Lets us load environment variables from a .env file
 python-jose==3.3.0     # JWT tokens — used to create and verify login sessions
 passlib==1.7.4         # Password hashing — NEVER store plain text passwords
 bcrypt==4.1.3          # The hashing algorithm passlib uses under the hood
+google-generativeai

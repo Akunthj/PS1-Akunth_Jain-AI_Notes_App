@@ -15,8 +15,9 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials  # Reads t
 from pydantic import BaseModel
 from typing import Optional
 import sqlite3
-import httpx
 import os
+import google.generativeai as genai
+from dotenv import load_dotenv
 from datetime import datetime, timedelta  # timedelta = "a duration of time" e.g. 7 days
 
 # NEW AUTH IMPORTS
@@ -255,12 +256,8 @@ def get_me(user_id: int = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="User not found")
     return row_to_dict(user)
 
+# NOTE ROUTES 
 
-# ============================================================
-# NOTE ROUTES — same as before, but now protected with Depends(get_current_user)
-# Every route gets `user_id` injected automatically from the token.
-# Notes are filtered by owner_id so users only see their own notes.
-# ============================================================
 
 @app.get("/notes")
 def get_all_notes(q: Optional[str] = None, user_id: int = Depends(get_current_user)):
@@ -350,34 +347,22 @@ def delete_note(note_id: int, user_id: int = Depends(get_current_user)):
     return {"message": f"Note {note_id} deleted"}
 
 
-# ============================================================
-# AI ROUTES — same as before, just protected now
-# ============================================================
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+# AI ROUTES
+
+load_dotenv()
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+genai.configure(api_key=GEMINI_API_KEY)
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 async def call_claude(prompt: str) -> str:
-    if not ANTHROPIC_API_KEY:
-        return "API key not configured. Set the ANTHROPIC_API_KEY environment variable."
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={
-                "x-api-key": ANTHROPIC_API_KEY,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json",
-            },
-            json={
-                "model": "claude-haiku-4-5-20251001",
-                "max_tokens": 200,
-                "messages": [{"role": "user", "content": prompt}]
-            },
-            timeout=30.0
-        )
-    data = response.json()
-    if "content" in data and len(data["content"]) > 0:
-        return data["content"][0]["text"]
-    return f"AI error: {data.get('error', {}).get('message', 'Unknown error')}"
+    if not GEMINI_API_KEY:
+        return "API key not configured. Set the GEMINI_API_KEY environment variable."
 
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"AI error: {str(e)}"
 
 @app.post("/notes/{note_id}/summarize")
 async def summarize_note(note_id: int, user_id: int = Depends(get_current_user)):
