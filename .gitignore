@@ -1,0 +1,11 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.env          # NEVER commit this — it contains your API key
+*.db          # The SQLite database file (regenerates automatically)
+
+# Node
+node_modules/
+dist/
+.DS_Store
